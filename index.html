@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>EmberPrint - Carbon Footprint Calculator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#14070a;--bg2:#2a0a10;--card:rgba(255,255,255,.06);--line:rgba(255,120,130,.22);--tx:#fff1f2;--mut:#e0a9ae;--r:#ff2d3d;--r2:#ff6b5e;--rd:#a60f20;--track:rgba(255,255,255,.14);--glow:rgba(255,45,61,.45);
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#fff3f3;--bg2:#ffd9dc;--card:rgba(255,255,255,.75);--line:rgba(190,20,40,.25);--tx:#2b0a0f;--mut:#8a3d45;--track:rgba(120,0,15,.15);--glow:rgba(255,45,61,.3)}}
+:root[data-theme="dark"]{--bg:#14070a;--bg2:#2a0a10;--card:rgba(255,255,255,.06);--line:rgba(255,120,130,.22);--tx:#fff1f2;--mut:#e0a9ae;--track:rgba(255,255,255,.14);--glow:rgba(255,45,61,.45)}
+:root[data-theme="light"]{--bg:#fff3f3;--bg2:#ffd9dc;--card:rgba(255,255,255,.75);--line:rgba(190,20,40,.25);--tx:#2b0a0f;--mut:#8a3d45;--track:rgba(120,0,15,.15);--glow:rgba(255,45,61,.3)}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;min-height:100%;font:16px/1.55 'DM Sans',system-ui,sans-serif;color:var(--tx);background:radial-gradient(900px 500px at 85% -5%,var(--glow),transparent 60%),radial-gradient(700px 500px at -10% 40%,rgba(166,15,32,.35),transparent 60%),linear-gradient(180deg,var(--bg2),var(--bg) 40%);background-color:var(--bg);overflow-x:hidden}
+h1,h2,h3{font-family:'Bricolage Grotesque','DM Sans',system-ui,sans-serif;margin:0;line-height:1.05}
+.wrap{max-width:1120px;margin:0 auto;padding:20px 18px 110px}
+nav{display:flex;justify-content:space-between;align-items:center;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:20px}
+nav i{display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--r);box-shadow:0 0 14px var(--r);margin-right:8px}
+.tg{background:var(--card);border:1px solid var(--line);color:var(--tx);border-radius:99px;padding:8px 14px;cursor:pointer;font:inherit;font-size:14px}
+.hero{padding:44px 0 30px;display:grid;grid-template-columns:1.3fr .7fr;gap:30px;align-items:center}
+.hero h1{font-size:clamp(40px,7vw,78px);font-weight:800;letter-spacing:-.03em}
+.hero h1 span{background:linear-gradient(90deg,var(--r),var(--r2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{color:var(--mut);max-width:46ch;font-size:18px;margin:16px 0 22px}
+.btn{display:inline-block;background:linear-gradient(135deg,var(--r),var(--rd));color:#fff;border:0;border-radius:14px;padding:14px 24px;font:700 16px 'DM Sans',sans-serif;cursor:pointer;text-decoration:none;box-shadow:0 8px 30px var(--glow);transition:transform .2s}
+.btn:hover{transform:translateY(-2px)}
+.orb{position:relative;aspect-ratio:1;max-width:280px;margin:auto;width:100%;display:grid;place-items:center}
+.orb b{position:absolute;inset:0;border-radius:50%;border:2px solid var(--r);opacity:0;animation:ping 3.6s infinite}
+.orb b:nth-child(2){animation-delay:1.2s}.orb b:nth-child(3){animation-delay:2.4s}
+.orb div{width:46%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 35% 30%,var(--r2),var(--r) 45%,var(--rd));display:grid;place-items:center;font:800 28px 'Bricolage Grotesque',sans-serif;color:#fff;box-shadow:0 0 70px var(--glow)}
+@keyframes ping{0%{transform:scale(.45);opacity:.9}100%{transform:scale(1);opacity:0}}
+.main{display:grid;grid-template-columns:1.15fr .85fr;gap:22px;align-items:start}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:22px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);margin-bottom:18px}
+.card h2{font-size:26px;margin-bottom:4px}
+.card>p{color:var(--mut);margin:0 0 16px;font-size:14px}
+.f{margin:16px 0}
+.f label,.f .lb{display:flex;justify-content:space-between;font-weight:500;font-size:15px;margin-bottom:8px}
+.f output{color:var(--r2);font-weight:700}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:7px;border-radius:9px;outline:none;background:linear-gradient(90deg,var(--r) var(--p,0%),var(--track) var(--p,0%))}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#fff;border:4px solid var(--r);box-shadow:0 0 14px var(--glow);cursor:pointer}
+input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:#fff;border:4px solid var(--r);cursor:pointer}
+:focus-visible{outline:3px solid var(--r2);outline-offset:3px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{background:transparent;border:1px solid var(--line);color:var(--tx);border-radius:12px;padding:8px 14px;font:inherit;font-size:14px;cursor:pointer;transition:.15s}
+.chip.on{background:var(--r);border-color:var(--r);color:#fff;font-weight:700;box-shadow:0 4px 18px var(--glow)}
+.res{position:sticky;top:calc(14px + env(safe-area-inset-top,0px))}
+.big{font:800 clamp(64px,9vw,92px)/1 'Bricolage Grotesque',sans-serif;letter-spacing:-.04em;color:var(--r);text-shadow:0 0 40px var(--glow)}
+.big small{font-size:22px;color:var(--mut);letter-spacing:0;margin-left:6px;font-weight:500}
+.badge{display:inline-block;margin:10px 0 4px;background:var(--r);color:#fff;border-radius:99px;padding:5px 14px;font-weight:700;font-size:14px}
+.sub{color:var(--mut);font-size:14px;margin:6px 0 16px}
+.donut{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.donut svg{width:150px;height:150px;transform:rotate(-90deg);flex:none}
+.donut circle{fill:none;stroke-width:22;transition:stroke-dasharray .6s,stroke-dashoffset .6s}
+.lg{flex:1;min-width:150px;font-size:14px}
+.lg div{display:flex;justify-content:space-between;gap:8px;padding:4px 0}
+.lg i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:8px}
+.cmp{margin-top:18px}
+.row{display:grid;grid-template-columns:70px 1fr 54px;gap:10px;align-items:center;font-size:13px;margin:7px 0}
+.bar{height:12px;border-radius:9px;background:var(--track);overflow:hidden}
+.bar span{display:block;height:100%;border-radius:9px;background:var(--mut);width:0;transition:width .6s}
+.row.me .bar span{background:linear-gradient(90deg,var(--rd),var(--r))}
+.tips{list-style:none;padding:0;margin:8px 0 0}
+.tips li{padding:10px 12px;margin:8px 0;border-left:3px solid var(--r);background:rgba(255,45,61,.08);border-radius:0 12px 12px 0;font-size:14px}
+.stat{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+.stat div{flex:1;min-width:120px;background:rgba(255,45,61,.1);border:1px solid var(--line);border-radius:14px;padding:10px 12px;font-size:13px;color:var(--mut)}
+.stat b{display:block;font:800 22px 'Bricolage Grotesque',sans-serif;color:var(--tx)}
+.pill{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(12px + env(safe-area-inset-bottom,0px));background:var(--r);color:#fff;font-weight:700;padding:11px 22px;border-radius:99px;box-shadow:0 8px 30px var(--glow);display:none;z-index:9}
+footer{color:var(--mut);font-size:13px;margin-top:10px}
+footer b{color:var(--tx)}
+@media (max-width:860px){.hero,.main{grid-template-columns:1fr}.res{position:static}.pill{display:block}.orb{max-width:180px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
+.wrap{position:relative;z-index:1}
+.card{position:relative;overflow:hidden}
+.gauge{display:block;width:100%;max-width:300px;margin:4px auto 0;overflow:visible}
+.gauge .t{fill:none;stroke:var(--track);stroke-width:14;stroke-linecap:round}
+.gauge .v{fill:none;stroke:url(#gg);stroke-width:14;stroke-linecap:round;stroke-dasharray:282.7;stroke-dashoffset:282.7;transition:stroke-dashoffset .9s cubic-bezier(.3,1.2,.5,1);filter:drop-shadow(0 0 6px var(--glow))}
+.gauge #nd{stroke:var(--tx);stroke-width:3.5;stroke-linecap:round;transform-origin:110px 110px;transform:rotate(-90deg);transition:transform .9s cubic-bezier(.3,1.4,.5,1)}
+.gauge .k{stroke:var(--mut);stroke-width:2.5}
+.gauge text{fill:var(--mut);font:11px 'DM Sans',sans-serif}
+.gcap{text-align:center;color:var(--mut);font-size:12px;margin:2px 0 14px}
+</style>
+</head>
+<body>
+<canvas id="fx" aria-hidden="true"></canvas>
+<div class="wrap">
+<nav><span><i></i>EmberPrint</span><button class="tg" id="tg" type="button">Switch theme</button></nav>
+
+<section class="hero">
+<div>
+<h1>What does your day cost <span>the planet?</span></h1>
+<p>Answer a few questions about how you travel, power your home, eat and shop. Your annual carbon footprint updates live as you move each slider.</p>
+<a class="btn" href="#calc">Calculate my footprint</a>
+</div>
+<div class="orb"><b></b><b></b><b></b><div>CO<sub style="font-size:.5em">2</sub></div></div>
+</section>
+
+<div class="main" id="calc">
+<div id="form"></div>
+<aside class="res">
+<div class="card" aria-live="polite">
+<h2>Your yearly footprint</h2>
+<div class="big"><span id="tot">0.00</span><small>tonnes CO₂e</small></div>
+<span class="badge" id="rate">-</span>
+<div class="sub" id="vs"></div>
+<svg class="gauge" viewBox="0 0 220 128" aria-label="Footprint gauge from 0 to 10 tonnes"><defs><linearGradient id="gg" x1="0" x2="1"><stop offset="0" stop-color="#ffb3a7"/><stop offset=".5" stop-color="#ff2d3d"/><stop offset="1" stop-color="#8a0014"/></linearGradient></defs><path class="t" d="M20 110 A90 90 0 0 1 200 110"/><path class="v" id="gv" d="M20 110 A90 90 0 0 1 200 110"/><line class="k" x1="110" y1="4" x2="110" y2="12" transform="rotate(-54 110 110)"/><line class="k" x1="110" y1="4" x2="110" y2="12" transform="rotate(-5.4 110 110)"/><line id="nd" x1="110" y1="110" x2="110" y2="34"/><circle cx="110" cy="110" r="7" fill="#ff2d3d"/><text x="14" y="126">0</text><text x="190" y="126">10+ t</text></svg>
+<div class="gcap">Tick marks show the India (2.0 t) and world (4.7 t) averages</div>
+<div class="donut"><svg viewBox="0 0 200 200" id="dn" aria-label="Breakdown by category"></svg><div class="lg" id="lg"></div></div>
+<div class="cmp" id="cmp"></div>
+<div class="stat"><div><b id="trees">0</b>trees needed to absorb it each year</div><div><b id="day">0</b>kg CO₂e per day</div></div>
+</div>
+<div class="card"><h2>How to shrink it</h2><p id="tp">Your biggest sources first.</p><ul class="tips" id="tips"></ul>
+<button class="btn" id="cp" type="button" style="margin-top:8px">Copy my result</button></div>
+</aside>
+</div>
+
+<footer><b>How it works.</b> Each answer is converted to kg of CO₂-equivalent with an emission factor, then added up per year. Factors used (approximate, India-focused): grid electricity 0.82 kg/kWh; petrol car 0.17, diesel 0.16, CNG 0.10, 2-wheeler 0.05, electric 0.06 kg/km; bus/metro/train 0.06 kg/km; short flight 250 kg, long flight 1,100 kg; LPG 42.6 kg per 14.2 kg cylinder; a tree absorbs about 21 kg per year. Averages: India 2.0 t, world 4.7 t per person. This is an educational estimate, not an audit.</footer>
+</div>
+<div class="pill" id="pill">0.00 t CO₂e / year</div>
+
+<script>
+var G=[
+{k:'Transport',e:'🚗',d:'How you get around',c:[
+{s:'car',l:'Car or bike travel',min:0,max:500,st:10,v:60,u:' km/week'},
+{o:'veh',l:'Vehicle type',v:.17,opts:[['Petrol',.17],['Diesel',.16],['CNG',.1],['2-wheeler',.05],['Electric',.06]]},
+{s:'pub',l:'Bus, metro or train',min:0,max:300,st:5,v:40,u:' km/week'},
+{s:'sf',l:'Short flights (under 3 hrs)',min:0,max:20,st:1,v:1,u:' per year'},
+{s:'lf',l:'Long flights (over 3 hrs)',min:0,max:10,st:1,v:0,u:' per year'}]},
+{k:'Home energy',e:'🏠',d:'Electricity and cooking gas, shared by everyone at home',c:[
+{s:'ppl',l:'People in your household',min:1,max:10,st:1,v:4,u:''},
+{s:'el',l:'Electricity use',min:0,max:800,st:10,v:150,u:' kWh/month'},
+{s:'lpg',l:'LPG cylinders used',min:0,max:3,st:.25,v:.5,u:' per month'},
+{o:'sol',l:'Do you use solar or renewable power?',v:0,opts:[['No',0],['Yes',1]]}]},
+{k:'Food',e:'🍛',d:'What is usually on your plate',c:[
+{o:'diet',l:'Your diet',v:1700,opts:[['Vegan',900],['Vegetarian',1200],['Eggs, no meat',1500],['Meat sometimes',1700],['Meat daily',2800]]}]},
+{k:'Lifestyle',e:'🛍️',d:'Shopping, waste and screens',c:[
+{s:'shop',l:'Spending on clothes, gadgets and goods',min:0,max:30000,st:500,v:3000,u:' Rs/month'},
+{s:'scr',l:'Screen time (phone, laptop, streaming)',min:0,max:16,st:1,v:6,u:' hrs/day'},
+{o:'wst',l:'Household waste',v:300,opts:[['Low',150],['Medium',300],['High',500]]},
+{o:'rec',l:'Do you recycle and compost?',v:1,opts:[['Yes',1],['No',0]]}]}];
+var COL=['#ff2d3d','#ff8a7a','#a60f20','#ffc2bd'],S={},V={},cur=0,$=function(i){return document.getElementById(i)};
+var form=$('form');
+G.forEach(function(g){
+ var h='<section class="card"><h2>'+g.e+' '+g.k+'</h2><p>'+g.d+'</p>';
+ g.c.forEach(function(c){
+  if(c.s){V[c.s]=c.v;h+='<div class="f"><label for="'+c.s+'">'+c.l+'<output id="o_'+c.s+'"></output></label><input type="range" id="'+c.s+'" min="'+c.min+'" max="'+c.max+'" step="'+c.st+'" value="'+c.v+'"></div>'}
+  else{S[c.o]=c.v;h+='<div class="f"><div class="lb">'+c.l+'</div><div class="chips" data-o="'+c.o+'">'+c.opts.map(function(p){return '<button type="button" class="chip'+(p[1]===c.v?' on':'')+'" data-v="'+p[1]+'">'+p[0]+'</button>'}).join('')+'</div></div>'}
+ });
+ form.insertAdjacentHTML('beforeend',h+'</section>');
+});
+var U={};G.forEach(function(g){g.c.forEach(function(c){if(c.s)U[c.s]=c})});
+function sl(el){var c=U[el.id],p=(el.value-el.min)/(el.max-el.min)*100;el.style.setProperty('--p',p+'%');V[el.id]=+el.value;$('o_'+el.id).textContent=el.value+c.u}
+document.querySelectorAll('input[type=range]').forEach(function(el){sl(el);el.addEventListener('input',function(){sl(el);calc()})});
+document.querySelectorAll('.chips').forEach(function(box){box.addEventListener('click',function(e){var b=e.target.closest('.chip');if(!b)return;box.querySelectorAll('.chip').forEach(function(x){x.classList.remove('on')});b.classList.add('on');S[box.dataset.o]=+b.dataset.v;calc()})});
+
+var BASE={IN:2.0,WORLD:4.7};
+var TIPS={Transport:['Replace two car trips a week with metro, bus or cycling.','Carpool to campus or work; sharing a ride halves your per-person emissions.','Skip one flight a year or take a train for trips under 500 km.'],
+'Home energy':['Switch to 5-star appliances and LED lights, and set the AC to 24-26 C.','Unplug chargers and devices on standby; they quietly draw power all day.','Look into rooftop solar or a green-energy plan from your power provider.'],
+Food:['Try meat-free days; each one trims roughly 1 kg of CO₂e from your plate.','Buy local and seasonal produce, and plan meals to avoid food waste.','Swap some dairy and red meat for lentils, beans and pulses.'],
+Lifestyle:['Buy fewer, longer-lasting things; repair or buy second-hand first.','Segregate waste and start composting kitchen scraps.','Lower video quality and use Wi-Fi instead of mobile data when streaming.']};
+
+function calc(){
+ var tr=(V.car*S.veh+V.pub*.06)*52+V.sf*250+V.lf*1100;
+ var hm=(V.el*12*.82*(S.sol?.3:1)+V.lpg*12*42.6)/V.ppl;
+ var fd=S.diet;
+ var lf=V.shop*12*.006+S.wst*(S.rec?.7:1)+V.scr*365*.08;
+ var parts=[['Transport',tr],['Home energy',hm],['Food',fd],['Lifestyle',lf]];
+ var kg=tr+hm+fd+lf,t=kg/1000;
+ anim(t);gauge(t);
+ $('pill').textContent=t.toFixed(2)+' t CO₂e / year';
+ var r=t<1.5?['Planet hero','Well below the Indian average.']:t<2.5?['Green achiever','Close to the 2 tonne goal for 2050.']:t<4.7?['On the way','Above the Indian average, but below the world average.']:t<8?['Heavy footprint','Above the world average.']:['Red alert','Several times the world average.'];
+ $('rate').textContent=r[0];
+ $('vs').textContent=r[1]+' You are at '+Math.round(t/BASE.IN*100)+'% of the average Indian.';
+ var C=2*Math.PI*78,off=0,h='',lg='';
+ parts.forEach(function(p,i){var f=kg?p[1]/kg:0,l=f*C;
+  h+='<circle cx="100" cy="100" r="78" stroke="'+COL[i]+'" stroke-dasharray="'+Math.max(l-2,0)+' '+C+'" stroke-dashoffset="'+(-off)+'"/>';off+=l;
+  lg+='<div><span><i style="background:'+COL[i]+'"></i>'+p[0]+'</span><b>'+Math.round(f*100)+'%</b></div>'});
+ $('dn').innerHTML=h;$('lg').innerHTML=lg;
+ var mx=Math.max(t,BASE.WORLD,BASE.IN)*1.05,rows=[['You',t,'me'],['India',BASE.IN,''],['World',BASE.WORLD,'']];
+ $('cmp').innerHTML=rows.map(function(x){return '<div class="row '+x[2]+'"><span>'+x[0]+'</span><div class="bar"><span style="width:'+(x[1]/mx*100)+'%"></span></div><b>'+x[1].toFixed(1)+' t</b></div>'}).join('');
+ $('trees').textContent=Math.round(kg/21);$('day').textContent=(kg/365).toFixed(1);
+ var s=parts.slice().sort(function(a,b){return b[1]-a[1]});
+ $('tp').textContent='Your biggest source is '+s[0][0].toLowerCase()+' ('+Math.round(s[0][1]/kg*100||0)+'%). Start there.';
+ $('tips').innerHTML=TIPS[s[0][0]].slice(0,2).concat(TIPS[s[1][0]].slice(0,1)).map(function(x){return '<li>'+x+'</li>'}).join('');
+ window._res='My yearly carbon footprint is '+t.toFixed(2)+' tonnes CO₂e ('+r[0]+'). India average: 2.0 t, world average: 4.7 t.';
+}
+function anim(to){var from=cur,st=performance.now();(function f(n){var k=Math.min((n-st)/500,1),e=1-Math.pow(1-k,3);cur=from+(to-from)*e;$('tot').textContent=cur.toFixed(2);if(k<1)requestAnimationFrame(f)})(st)}
+$('cp').addEventListener('click',function(){var b=this;try{navigator.clipboard.writeText(window._res).then(function(){b.textContent='Copied'},function(){b.textContent='Copy not allowed here'})}catch(e){b.textContent='Copy not allowed here'}setTimeout(function(){b.textContent='Copy my result'},1800)});
+$('tg').addEventListener('click',function(){var d=document.documentElement,dark=d.dataset.theme?d.dataset.theme==='dark':!matchMedia('(prefers-color-scheme:light)').matches;d.dataset.theme=dark?'light':'dark'});
+function gauge(t){var k=Math.min(t/10,1);$('gv').style.strokeDashoffset=282.7*(1-k);$('nd').style.transform='rotate('+(-90+k*180)+'deg)'}
+(function(){var c=$('fx'),x=c.getContext('2d'),W,H,P=[];if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+function rs(){W=c.width=innerWidth;H=c.height=innerHeight}
+function mk(a){return{x:Math.random()*W,y:a?Math.random()*H:H+10,r:Math.random()*2.2+.6,s:Math.random()*.7+.25,d:Math.random()*6.28,o:Math.random()*.55+.2}}
+rs();addEventListener('resize',rs);for(var i=0;i<60;i++)P.push(mk(true));
+(function f(){x.clearRect(0,0,W,H);P.forEach(function(p,i){p.y-=p.s;p.d+=.02;p.x+=Math.sin(p.d)*.4;if(p.y<-10)P[i]=mk(false);x.beginPath();x.fillStyle='rgba(255,'+(80+p.o*90|0)+',70,'+p.o+')';x.shadowColor='#ff2d3d';x.shadowBlur=10;x.arc(p.x,p.y,p.r,0,6.28);x.fill()});requestAnimationFrame(f)})()})();
+calc();
+</script>
+</body>
+</html>
